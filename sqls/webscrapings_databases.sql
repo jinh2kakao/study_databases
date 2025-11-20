@@ -4,6 +4,7 @@
 --     link_html varchar(500),
 --     link_href varchar(500)
 -- );
+-- https://www.w3schools.com/sql/sql_create_db.asp
 
 CREATE TABLE study_webscripings_database (
     id varchar(500) PRIMARY KEY,
