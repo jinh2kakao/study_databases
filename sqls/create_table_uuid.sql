@@ -14,3 +14,13 @@ VALUES ('John Doe'),
     ('Jane Doe'),
     ('Alice'),
     ('Tom');
+
+UPDATE users_uuid_name
+SET name = 'Updated Name'
+WHERE id_name = '2bb076c5-cfc4-412a-9094-37247cff0950';
+
+
+DELETE FROM users_uuid_name
+WHERE id_name = 'f7ce7ffc-f182-4ae2-882c-2e4f631cc530';
+
+SELECT * FROM users_uuid_name;
