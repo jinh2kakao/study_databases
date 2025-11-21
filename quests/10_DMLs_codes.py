@@ -2,22 +2,15 @@
 import psycopg2
 import os
 
-db_host = "db_postgresql"
-db_port = "5432"
-db_name = "main_db"
-db_user = "admin"
-db_password = "admin123"
-
 def get_postgres_connection():
     """PostgreSQL 연결 객체를 반환합니다."""
-    # 중요: 실제 운영 환경에서는 환경 변수나 보안 설정 파일을 사용하는 것이 좋습니다.
-    # 이 스크립트는 교육용으로 하드코딩된 값을 사용합니다.
+    # codes/postgres_connection.py의 설정을 참고하여 수정함
     return psycopg2.connect(
-    host=db_host,
-    port=db_port,
-    dbname=db_name,
-    user=db_user,
-    password=db_password
+        host="db_postgresql",   # localhost -> db_postgresql
+        port="5432",
+        dbname="main_db",       # mydatabase -> main_db
+        user="admin",           # myuser -> admin
+        password="admin123"     # mypassword -> admin123
     )
 
 # -- 스크립트 시작 --
@@ -62,15 +55,15 @@ try:
     # 문제 3: 데이터 조회 (전체, 조건, 특정)
     print("\n--- [문제 3] 데이터 조회 ---")
     
+    # NOTE: 문제의 '순서' 가정을 맞추기 위해 ORDER BY 없이 조회 (삽입 순서 유지 기대)
     print("\n[3-1] 전체 학생 조회:")
-    cur.execute("SELECT * FROM students ORDER BY name;" # 이름순으로 정렬하여 일관성 유지
-    )
+    cur.execute("SELECT * FROM students;") 
     all_students_initial = cur.fetchall()
     for row in all_students_initial:
         print(f"ID: {row[0]}, 이름: {row[1]}, 나이: {row[2]}")
 
     print("\n[3-2] 22세 이상 학생 조회:")
-    cur.execute("SELECT * FROM students WHERE age >= 22 ORDER BY name;")
+    cur.execute("SELECT * FROM students WHERE age >= 22;")
     students_over_22 = cur.fetchall()
     for row in students_over_22:
         print(f"ID: {row[0]}, 이름: {row[1]}, 나이: {row[2]}")
@@ -83,16 +76,16 @@ try:
 
     # 문제 4: 두 번째 학생(이영희)의 나이를 25로 수정 (Index 기반)
     print("\n--- [문제 4] 학생 정보 수정 (Index 기반) ---")
-    # 1, 2. 전체 목록 조회 및 두 번째 학생 선택
-    # NOTE: SQL에서 ORDER BY가 없으면 순서를 보장하지 않으므로, name으로 정렬하여 순서를 고정합니다.
-    cur.execute("SELECT id, name, age FROM students ORDER BY name;")
+    # 1, 2. 전체 목록 조회
+    cur.execute("SELECT id, name, age FROM students;")
     students_list_for_update = cur.fetchall()
     
     if len(students_list_for_update) > 1:
         # 3. 두 번째(Index 1) 레코드의 UUID 추출
-        target_student_record = students_list_for_update[1] # 두 번째 학생
+        # 예상: 홍길동(0), 이영희(1), 박철수(2) -> Index 1은 이영희
+        target_student_record = students_list_for_update[1] 
         target_id = target_student_record[0]
-        print(f"수정 대상 학생(두 번째): {target_student_record[1]}, UUID: {target_id}")
+        print(f"수정 대상 학생(Index 1): {target_student_record[1]}, UUID: {target_id}")
 
         # 4. 추출한 UUID로 UPDATE 실행
         update_query = "UPDATE students SET age = 25 WHERE id = %s;"
@@ -104,15 +97,16 @@ try:
 
     # 문제 5: 세 번째 학생(박철수)을 삭제 (Index 기반)
     print("\n--- [문제 5] 학생 정보 삭제 (Index 기반) ---")
-    # 1, 2. 전체 목록 다시 조회 및 세 번째 학생 선택
-    cur.execute("SELECT id, name, age FROM students ORDER BY name;")
+    # 1, 2. 전체 목록 다시 조회
+    cur.execute("SELECT id, name, age FROM students;")
     students_list_for_delete = cur.fetchall()
 
     if len(students_list_for_delete) > 2:
         # 3. 세 번째(Index 2) 레코드의 UUID 추출
-        target_student_record = students_list_for_delete[2] # 세 번째 학생
+        # 예상: 홍길동(0), 이영희(1), 박철수(2) -> Index 2는 박철수
+        target_student_record = students_list_for_delete[2] 
         target_id = target_student_record[0]
-        print(f"삭제 대상 학생(세 번째): {target_student_record[1]}, UUID: {target_id}")
+        print(f"삭제 대상 학생(Index 2): {target_student_record[1]}, UUID: {target_id}")
 
         # 4. 추출한 UUID로 DELETE 실행
         delete_query = "DELETE FROM students WHERE id = %s;"
@@ -124,7 +118,7 @@ try:
 
     # 최종 결과 확인
     print("\n--- 최종 데이터 확인 ---")
-    cur.execute("SELECT * FROM students ORDER BY name;")
+    cur.execute("SELECT * FROM students;")
     final_students = cur.fetchall()
     if not final_students:
         print("테이블에 남은 데이터가 없습니다.")
