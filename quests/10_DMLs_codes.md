@@ -1,3 +1,5 @@
+## Prompts
+```
 {
   "request_config": {
     "agent_role": "Senior Python Developer & SQL Educator",
@@ -25,3 +27,4 @@
     "reference_code": "import psycopg2\n\ndb_host = \"db_postgresql\"\ndb_port = \"5432\"\ndb_name = \"main_db\"\ndb_user = \"admin\"\ndb_password = \"admin123\"\n\nconn = psycopg2.connect(\n    host=db_host,\n    port=db_port,\n    dbname=db_name,\n    user=db_user,\n    password=db_password\n)\n# ... (connection logic)"
   }
 }
+```
