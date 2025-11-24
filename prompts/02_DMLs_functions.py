@@ -60,10 +60,9 @@ def insert_books(conn):
 def get_all_books(conn):
     """전체 도서 목록을 조회합니다."""
     with conn.cursor() as cur:
-        # 순서 보장을 위해 제목으로 정렬하거나, 단순히 입력 순서(heap scan)를 따를 수 있습니다.
-        # 여기서는 리스트 인덱싱 요구사항을 위해 별도 정렬 없이 가져오되,
-        # 실무에서는 ORDER BY를 권장합니다.
-        cur.execute("SELECT * FROM books;")
+        # 순서 보장을 위해 가격(또는 입력 의도) 기준으로 정렬합니다.
+        # 이를 통해 UPDATE 후 물리적 저장 순서가 변경되어도 논리적 순서를 유지합니다.
+        cur.execute("SELECT * FROM books ORDER BY price ASC;")
         return cur.fetchall()
 
 def get_expensive_books(conn):
